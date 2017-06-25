@@ -1,6 +1,6 @@
-# drupal7_commerce_paymaster
+# drupal7_commerce1_paymaster
 
-UC Paymaster module for Drupal 7 and Commerce
+Commerce Paymaster module for Drupal 7 and Commerce
 
 Модуль предназначен для работы с Drupal 7 и Commerce (1)
 
