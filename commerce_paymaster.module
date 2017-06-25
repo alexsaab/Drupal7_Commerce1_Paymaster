@@ -232,7 +232,7 @@ function commerce_paymaster_create_transaction($order, $order_wrapper, $remote_i
  */
 function commerce_paymaster_status_list()
 {
-    $datas = uc_order_status_list();
+    $datas = commerce_order_statuses();
     foreach ($datas as $data) {
         $status[$data['id']] = $data['title'];
     }
