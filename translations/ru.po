@@ -1,0 +1,155 @@
+# $Id$
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  commerce_paymaster.pages.inc: n/a
+#  commerce_paymaster.module: n/a
+#  commerce_paymaster.info: n/a
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2017-07-07 02:46+0300\n"
+"PO-Revision-Date: 2017-07-07 02:56+0300\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 2.0.2\n"
+"Last-Translator: \n"
+"Language: ru\n"
+
+#: commerce_paymaster.pages.inc:54
+msgid "Payment unsuccessful!"
+msgstr "Оплата успешно завершена!"
+
+#: commerce_paymaster.pages.inc:85
+msgid "Thank you, payment successful."
+msgstr "Спасибо. Ваша оплата успешно прошла."
+
+#: commerce_paymaster.pages.inc:91
+msgid "Unknown error."
+msgstr "Неизвестная ошибка."
+
+#: commerce_paymaster.module:45;167
+msgid "PayMaster"
+msgstr "PayMaster"
+
+#: commerce_paymaster.module:46
+msgid "PayMaster payment method"
+msgstr "Метод оплаты PayMaster"
+
+#: commerce_paymaster.module:72
+msgid "Merchant Id"
+msgstr "ID продавца"
+
+#: commerce_paymaster.module:73
+msgid ""
+"Your Merchant Id that you got from your personal account at paymaster.ru"
+msgstr ""
+"ID продавца, который вы можете узнать в интерфейсе системы PayMaster (в "
+"личном кабинете)"
+
+#: commerce_paymaster.module:80
+msgid "Secret Key"
+msgstr "Секретный ключ"
+
+#: commerce_paymaster.module:81
+msgid "Your secret key that you got from your personal account at paymaster.ru"
+msgstr ""
+"Секретный ключ (вы также можете его установить в интерфейсе продавца системы "
+"PayMaster)"
+
+#: commerce_paymaster.module:88
+msgid "Currency"
+msgstr "Валюта (ее код)"
+
+#: commerce_paymaster.module:89
+msgid "Currency Code"
+msgstr "Код валюты"
+
+#: commerce_paymaster.module:96
+msgid "Hash method for SIGN request option"
+msgstr "Выберите метод, которым будет подписываться запрос"
+
+#: commerce_paymaster.module:103
+msgid "Order description"
+msgstr "Описание заказа"
+
+#: commerce_paymaster.module:104
+msgid ""
+"Optional description for orders that will displays in PayMaster interface"
+msgstr ""
+"Необязательное описание для заказов, которые отображаются в интерфейсе "
+"PayMaster"
+
+#: commerce_paymaster.module:110
+msgid "Order status after payment"
+msgstr "Статус заказа после успешного платежа"
+
+#: commerce_paymaster.module:121
+msgid "VAT for product type \"@product_type\" for online invoicing"
+msgstr "НДС для типа товара @node_product_type для онлайн кассы"
+
+#: commerce_paymaster.module:123;139
+msgid "VAT 18%"
+msgstr "НДС 18%"
+
+#: commerce_paymaster.module:124;140
+msgid "VAT 10%"
+msgstr "НДС 10%"
+
+#: commerce_paymaster.module:125;141
+msgid "VAT formula 18/118"
+msgstr "НДС по формуле 18/118"
+
+#: commerce_paymaster.module:126;142
+msgid "VAT formula 10/110"
+msgstr "НДС по формуле 10/110"
+
+#: commerce_paymaster.module:127;143
+msgid "VAT 0%"
+msgstr "НДС 0%"
+
+#: commerce_paymaster.module:128;144
+msgid "No VAT"
+msgstr "Без НДС"
+
+#: commerce_paymaster.module:137
+msgid "VAT for delivery for online invoicing"
+msgstr "НДС для онлайн кассы для доставки товара"
+
+#: commerce_paymaster.module:176
+msgid ""
+"PayMaster - this is a multifunctional payment tool that provides secure and "
+"immediate transactions online."
+msgstr ""
+"PayMaster специальный агрегатор платежных систем с высокой скоростью работы "
+"и повышенной степенью защищенности."
+
+#: commerce_paymaster.module:220
+msgid "Payment for order #[commerce-order:order-id]"
+msgstr "Оплата для заказа #[commerce-order:order-id]"
+
+#: commerce_paymaster.module:267
+msgid "Pay via PayMaster"
+msgstr "Оплачивайте с PayMaster"
+
+#: commerce_paymaster.module:289
+msgid "The payment has completed."
+msgstr "Оплата была произведена успешно."
+
+#: commerce_paymaster.info:0
+msgid "Commerce PayMaster"
+msgstr "Commerce PayMaster"
+
+#: commerce_paymaster.info:0
+msgid "Provides a PayMaster payment method"
+msgstr "Обеспечивает метод оплаты через систему PayMaster"
+
+#: commerce_paymaster.info:0
+msgid "Commerce (contrib)"
+msgstr "Commerce (contrib)"
