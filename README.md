@@ -4,7 +4,10 @@ Commerce Paymaster module for Drupal 7 and Commerce
 
 Модуль предназначен для работы с Drupal 7 и Commerce (1)
 
-1. Залить через ftp в папку sites/all/modules/commerce_paymaster.
+1. Залить через ftp в папку sites/all/modules/commerce_paymaster
+ВНИМАНИЕ в папку /modules/ в корне сайта ничего не "заливать"! Так как это "плохой тон" для Drupal в этой папке лежат системные модули Drupal. 
+Папку commerce_paymaster нужно создать
+
 2. Включить модуль "Commerce Paymaster" В директории сайта admin/modules
 3. В директории сайта admin/commerce/config/payment-methods/manage/commerce_payment_commerce_paymaster произвести настройки:
 - Merchant id — идентификатор сайта (его можно взять в личном кабинете PayMaster);
