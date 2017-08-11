@@ -12,7 +12,6 @@ function commerce_paymaster_result_page_callback()
 	if (!empty($_POST))
 	{
 
-		watchdog('paymaster', print_r($_POST, true));
 		if (isset($_POST["LMI_PREREQUEST"]) && ($_POST["LMI_PREREQUEST"] == "1" || $_POST["LMI_PREREQUEST"] == "2"))
 		{
 			print 'YES';
@@ -29,11 +28,13 @@ function commerce_paymaster_result_page_callback()
 
 			$sign = commerce_paymaster_get_sign($_POST["LMI_MERCHANT_ID"], $_POST['LMI_PAYMENT_NO'], number_format((float) $_POST["LMI_PAYMENT_AMOUNT"], 2, '.', ''), $_POST["LMI_CURRENCY"], $secret_key, $sign_method);
 
+
 			if ($hash == $_POST['LMI_HASH'] && $_POST["SIGN"] == $sign)
 			{
+
 				$order_wrapper = entity_metadata_wrapper('commerce_order', $order);
 
-				commerce_order_status_update($order, variable_get('paymaster_order_status', 'pending'), false, NULL, t('Paymaster payment was processed!'));
+				commerce_order_status_update($order, $payment_method['settings']['paymaster_order_status'], false, NULL, t('Paymaster payment was processed!'));
 
 				commerce_paymaster_create_transaction($order, $order_wrapper, $_POST['LMI_SYS_PAYMENT_ID']);
 
@@ -103,6 +104,7 @@ function commerce_paymaster_success_page_callback()
 		if ($order = commerce_order_load($_REQUEST['LMI_PAYMENT_NO']))
 		{
 			drupal_set_message(t('Thank you, payment successful.'));
+
 			commerce_payment_redirect_pane_next_page($order);
 			drupal_goto(commerce_checkout_order_uri($order));
 		}

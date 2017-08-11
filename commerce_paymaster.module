@@ -63,12 +63,25 @@ function commerce_paymaster_commerce_payment_method_info()
  */
 function commerce_paymaster_settings_form($settings = null)
 {
-	$settings = (array) $settings + array(
-			'paymaster_merchant_id' => '',
-			'paymaster_secret'      => '',
-			'paymaster_currency'    => 'RUB',
-			'paymaster_desc'        => ''
+	$settingsModule =
+		array(
+			'paymaster_merchant_id'  => '',
+			'paymaster_secret'       => '',
+			'paymaster_currency'     => 'RUB',
+			'paymaster_desc'         => '',
+			'paymaster_sign_method'  => 'md5',
+			'paymaster_order_status' => 'pending',
+			'paymaster_shipping_vat' => 'no_vat',
 		);
+
+	$product_types = commerce_product_types();
+
+	foreach ($product_types as $key => $product_type) {
+		$settingsModule["paymaster_product_{$key}_vat"] = 'vat18';
+	}
+
+	$settings = (array) $settings + $settingsModule;
+
 
 	$form = array();
 
@@ -100,7 +113,7 @@ function commerce_paymaster_settings_form($settings = null)
 		'#type'          => 'select',
 		'#title'         => t('Hash method for SIGN request option'),
 		'#options'       => commerce_paymaster_sign_options(),
-		'#default_value' => variable_get('paymaster_sign_method', 'md5'),
+		'#default_value' => $settings['paymaster_sign_method'],
 	);
 
 	$form['paymaster_desc'] = array(
@@ -114,10 +127,10 @@ function commerce_paymaster_settings_form($settings = null)
 		'#type'          => 'select',
 		'#title'         => t('Order status after payment'),
 		'#options'       => commerce_paymaster_status_list(),
-		'#default_value' => variable_get('paymaster_order_status', 'pending'),
+		'#default_value' => $settings['paymaster_order_status'],
 	);
 
-	$product_types = commerce_product_types();
+
 
 	//create in each material type field with product superstatus
 	foreach ($product_types as $key => $product_type)
@@ -133,7 +146,8 @@ function commerce_paymaster_settings_form($settings = null)
 				'vat0'   => t('VAT 0%'),
 				'no_vat' => t('No VAT'),
 			],
-			'#default_value' => variable_get("paymaster_product_{$key}_vat", 'vat18'),
+			'#default_value' => $settings["paymaster_product_{$key}_vat"]
+
 		);
 	}
 
@@ -149,7 +163,7 @@ function commerce_paymaster_settings_form($settings = null)
 			'vat0'   => t('VAT 0%'),
 			'no_vat' => t('No VAT'),
 		],
-		'#default_value' => variable_get('paymaster_shipping_vat', 'no_vat'),
+		'#default_value' => $settings['paymaster_shipping_vat'],
 	);
 
 
@@ -246,7 +260,7 @@ function commerce_paymaster_redirect_form($form, &$form_state, $order, $payment_
 		'LMI_PAYER_EMAIL'    => $order->mail,
 		'PAYER_NAME'         => $address['name_line'],
 		'PAYER_ADRESS'       => $address['locality'],
-		'SING'               => commerce_paymaster_get_sign($merchant_id, $order->order_id, $amount, $currency_code, $payment_method['settings']['paymaster_secret'], $sign_method),
+		'SIGN'               => commerce_paymaster_get_sign($merchant_id, $order->order_id, number_format((float) $amount, 2, '.', ''), $currency_code, $payment_method['settings']['paymaster_secret'], $sign_method),
 	);
 
 	$order_wrapper = entity_metadata_wrapper('commerce_order', $order);
