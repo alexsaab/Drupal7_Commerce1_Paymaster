@@ -19,9 +19,9 @@ Commerce Paymaster module for Drupal 7 and Commerce
 - VAT for XXX for online invoicing - здесь XXX тип товара в Ubercart, разные товары могут иметь разные ставки НДС. Это необходимо для работы нового федерального закона от 22.05.2003 N 54-ФЗ «О применении контрольно-кассовой техники при осуществлении наличных денежных расчетов и (или) расчетов с использованием платежных карт». То есть вы можете создать в Ubercart разные товары с разными ставками НДС - это как раз необходимо для онлайн кассы;
 - VAT for delivery for online invoicing - ставка НДС для товара типа (точнее услуги) доставка.
 4. В личном кабинете PayMaster (Список сайтов->Настройки->Обратные вызовы):
-В Payment notification выбрать POST-запрос и прописать: http://ВАШ_САЙТ.ru/cart/paymaster/result
-В Success redirect выбрать POST-запрос и прописать: http://ВАШ_САЙТ.ru/cart/paymaster/success
-В Failure redirect выбрать POST-запрос и прописать: http://ВАШ_САЙТ.ru/cart/paymaster/fail
+В Payment notification выбрать POST-запрос и прописать: http://ВАШ_САЙТ.ru/commerce/paymaster/result
+В Success redirect выбрать POST-запрос и прописать: http://ВАШ_САЙТ.ru/commerce/paymaster/success
+В Failure redirect выбрать POST-запрос и прописать: http://ВАШ_САЙТ.ru/commerce/paymaster/fail
  
 
 _Все вопросы по разработке/доработке модуля присылайте на awa77 собака mail.ru
