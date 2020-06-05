@@ -13,28 +13,30 @@ define('COMMERCE_PAYMASTER_FAIL_URL', 'commerce/paymaster/fail');
  */
 function commerce_paymaster_menu()
 {
-	$items[COMMERCE_PAYMASTER_RESULT_URL] = array(
-		'page callback'    => 'commerce_paymaster_result_page_callback',
-		'access arguments' => array('access content'),
-		'type'             => MENU_CALLBACK,
-		'file'             => 'commerce_paymaster.pages.inc',
-	);
 
-	$items[COMMERCE_PAYMASTER_SUCCESS_URL] = array(
-		'page callback'    => 'commerce_paymaster_success_page_callback',
-		'access arguments' => array('access content'),
-		'type'             => MENU_CALLBACK,
-		'file'             => 'commerce_paymaster.pages.inc',
-	);
+  //
+  $items[COMMERCE_PAYMASTER_RESULT_URL] = array(
+    'page callback' => 'commerce_paymaster_result_page_callback',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'commerce_paymaster.pages.inc',
+  );
 
-	$items[COMMERCE_PAYMASTER_FAIL_URL] = array(
-		'page callback'    => 'commerce_paymaster_fail_page_callback',
-		'access arguments' => array('access content'),
-		'type'             => MENU_CALLBACK,
-		'file'             => 'commerce_paymaster.pages.inc',
-	);
+  $items[COMMERCE_PAYMASTER_SUCCESS_URL] = array(
+    'page callback' => 'commerce_paymaster_success_page_callback',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'commerce_paymaster.pages.inc',
+  );
 
-	return $items;
+  $items[COMMERCE_PAYMASTER_FAIL_URL] = array(
+    'page callback' => 'commerce_paymaster_fail_page_callback',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'commerce_paymaster.pages.inc',
+  );
+
+  return $items;
 }
 
 /**
@@ -42,175 +44,153 @@ function commerce_paymaster_menu()
  */
 function commerce_paymaster_commerce_payment_method_info()
 {
-	return array(
-		'commerce_paymaster' => array(
-			'title'                => t('PayMaster'),
-			'description'          => t('PayMaster payment method'),
-			'terminal'             => false,
-			'offsite'              => true,
-			'offsite_autoredirect' => true,
-			'active'               => true,
-		),
-	);
+  return array(
+    'commerce_paymaster' => array(
+      'title' => t('PayMaster'),
+      'description' => t('PayMaster payment method'),
+      'terminal' => FALSE,
+      'offsite' => TRUE,
+      'offsite_autoredirect' => TRUE,
+      'active' => TRUE,
+    ),
+  );
 }
 
 /**
  * Payment method callback: settings form.
- *
  * @param null $settings
- *
  * @return array
  */
-function commerce_paymaster_settings_form($settings = null)
+function commerce_paymaster_settings_form($settings = NULL)
 {
-	$settingsModule =
-		array(
-			'paymaster_merchant_id'  => '',
-			'paymaster_secret'       => '',
-			'paymaster_currency'     => 'RUB',
-			'paymaster_desc'         => '',
-			'paymaster_sign_method'  => 'md5',
-			'paymaster_order_status' => 'pending',
-			'paymaster_shipping_vat' => 'no_vat',
-		);
+  $settings = (array)$settings + array(
+      'paymaster_merchant_id' => '',
+      'paymaster_secret' => '',
+      'paymaster_currency' => 'RUB',
+      'paymaster_desc' => ''
+    );
 
-	$product_types = commerce_product_types();
+  $form = array();
 
-	foreach ($product_types as $key => $product_type) {
-		$settingsModule["paymaster_product_{$key}_vat"] = 'vat18';
-	}
+  $form['paymaster_merchant_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Merchant Id'),
+    '#description' => t('Your Merchant Id that you got from your personal account at paymaster.ru'),
+    '#default_value' => $settings['paymaster_merchant_id'],
+    '#required' => TRUE,
+  );
 
-	$settings = (array) $settings + $settingsModule;
+  $form['paymaster_secret'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Secret Key'),
+    '#description' => t('Your secret key that you got from your personal account at paymaster.ru'),
+    '#default_value' => $settings['paymaster_secret'],
+    '#required' => TRUE,
+  );
 
+  $form['paymaster_currency'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Currency'),
+    '#description' => t('Currency Code'),
+    '#default_value' => $settings['paymaster_currency'],
+    '#required' => TRUE,
+  );
 
-	$form = array();
+  $form['paymaster_sign_method'] = array(
+    '#type' => 'select',
+    '#title' => t('Hash method for SIGN request option'),
+    '#options' => commerce_paymaster_sign_options(),
+    '#default_value' => variable_get('paymaster_sign_method', 'md5'),
+  );
 
-	$form['paymaster_merchant_id'] = array(
-		'#type'          => 'textfield',
-		'#title'         => t('Merchant Id'),
-		'#description'   => t('Your Merchant Id that you got from your personal account at paymaster.ru'),
-		'#default_value' => $settings['paymaster_merchant_id'],
-		'#required'      => true,
-	);
+  $form['paymaster_desc'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Order description'),
+    '#description' => t('Optional description for orders that will displays in PayMaster interface'),
+    '#default_value' => $settings['paymaster_desc'],
+  );
 
-	$form['paymaster_secret'] = array(
-		'#type'          => 'textfield',
-		'#title'         => t('Secret Key'),
-		'#description'   => t('Your secret key that you got from your personal account at paymaster.ru'),
-		'#default_value' => $settings['paymaster_secret'],
-		'#required'      => true,
-	);
+  $form['paymaster_order_status'] = array(
+    '#type' => 'select',
+    '#title' => t('Order status after payment'),
+    '#options' => commerce_paymaster_status_list(),
+    '#default_value' => $settings['paymaster_order_status'],
+  );
 
-	$form['paymaster_currency'] = array(
-		'#type'          => 'textfield',
-		'#title'         => t('Currency'),
-		'#description'   => t('Currency Code'),
-		'#default_value' => $settings['paymaster_currency'],
-		'#required'      => true,
-	);
+  $product_types = commerce_product_types();
 
-	$form['paymaster_sign_method'] = array(
-		'#type'          => 'select',
-		'#title'         => t('Hash method for SIGN request option'),
-		'#options'       => commerce_paymaster_sign_options(),
-		'#default_value' => $settings['paymaster_sign_method'],
-	);
+  //create in each material type field with product superstatus
+  foreach ($product_types as $key => $product_type) {
+    $form["paymaster_product_{$key}_vat"] = array(
+      '#type' => 'select',
+      '#title' => t('VAT for product type "@product_type" for online invoicing', array('@product_type' => $product_type['name'])),
+      '#options' => [
+        'vat18' => t('VAT 18%'),
+        'vat10' => t('VAT 10%'),
+        'vat118' => t('VAT formula 18/118'),
+        'vat110' => t('VAT formula 10/110'),
+        'vat0' => t('VAT 0%'),
+        'no_vat' => t('No VAT'),
+      ],
+      '#default_value' => $settings["paymaster_product_{$key}_vat"],
+    );
+  }
 
-	$form['paymaster_desc'] = array(
-		'#type'          => 'textfield',
-		'#title'         => t('Order description'),
-		'#description'   => t('Optional description for orders that will displays in PayMaster interface'),
-		'#default_value' => $settings['paymaster_desc'],
-	);
+  $form['paymaster_shipping_vat'] = array(
+    '#type' => 'select',
+    '#title' => t('VAT for delivery for online invoicing'),
+    '#options' => [
+      'vat18' => t('VAT 18%'),
+      'vat10' => t('VAT 10%'),
+      'vat118' => t('VAT formula 18/118'),
+      'vat110' => t('VAT formula 10/110'),
+      'vat0' => t('VAT 0%'),
+      'no_vat' => t('No VAT'),
+    ],
+    '#default_value' => $settings['paymaster_shipping_vat'],
+  );
 
-	$form['paymaster_order_status'] = array(
-		'#type'          => 'select',
-		'#title'         => t('Order status after payment'),
-		'#options'       => commerce_paymaster_status_list(),
-		'#default_value' => $settings['paymaster_order_status'],
-	);
-
-
-
-	//create in each material type field with product superstatus
-	foreach ($product_types as $key => $product_type)
-	{
-		$form["paymaster_product_{$key}_vat"] = array(
-			'#type'          => 'select',
-			'#title'         => t('VAT for product type "@product_type" for online invoicing', array('@product_type' => $product_type['name'])),
-			'#options'       => [
-				'vat18'  => t('VAT 18%'),
-				'vat10'  => t('VAT 10%'),
-				'vat118' => t('VAT formula 18/118'),
-				'vat110' => t('VAT formula 10/110'),
-				'vat0'   => t('VAT 0%'),
-				'no_vat' => t('No VAT'),
-			],
-			'#default_value' => $settings["paymaster_product_{$key}_vat"]
-
-		);
-	}
-
-
-	$form['paymaster_shipping_vat'] = array(
-		'#type'          => 'select',
-		'#title'         => t('VAT for delivery for online invoicing'),
-		'#options'       => [
-			'vat18'  => t('VAT 18%'),
-			'vat10'  => t('VAT 10%'),
-			'vat118' => t('VAT formula 18/118'),
-			'vat110' => t('VAT formula 10/110'),
-			'vat0'   => t('VAT 0%'),
-			'no_vat' => t('No VAT'),
-		],
-		'#default_value' => $settings['paymaster_shipping_vat'],
-	);
-
-
-	return $form;
+  return $form;
 }
 
 /**
  * Payment method callback: checkout form.
- *
  * @param $payment_method
  * @param $pane_values
  * @param $checkout_pane
  * @param $order
- *
  * @return array
  */
 function commerce_paymaster_submit_form($payment_method, $pane_values, $checkout_pane, $order)
 {
-	$form = array();
+  $form = array();
 
-	$form['image'] = array(
-		'#theme'      => 'image',
-		'#path'       => drupal_get_path('module', 'commerce_paymaster') . '/images/paymaster.png',
-		'#alt'        => t('PayMaster'),
-		'#attributes' => array(
-			'class' => array('commerce-paymaster-logo'),
-		),
-	);
+  $form['image'] = array(
+    '#theme' => 'image',
+    '#path' => drupal_get_path('module', 'commerce_paymaster') . '/images/paymaster-logo.svg',
+    '#alt' => t('PayMaster'),
+    '#attributes' => array(
+      'class' => array('commerce-paymaster-logo'),
+    ),
+  );
 
-	$form['desc'] = array(
-		'#prefix' => '<div class="commerce-paymaster-payment-description">',
-		'#suffix' => '</div>',
-		'#markup' => t('PayMaster - this is a multifunctional payment tool that provides secure and immediate transactions online.'),
-	);
+  $form['desc'] = array(
+    '#prefix' => '<div class="commerce-paymaster-payment-description">',
+    '#suffix' => '</div>',
+    '#markup' => t('PayMaster - this is a multifunctional payment tool that provides secure and immediate transactions online.'),
+  );
 
-	// http://drupal.org/node/1705862
-	$form['dummy'] = array(
-		'#type'  => 'hidden',
-		'#value' => 'dummy',
-	);
+  // http://drupal.org/node/1705862
+  $form['dummy'] = array(
+    '#type' => 'hidden',
+    '#value' => 'dummy',
+  );
 
-	return $form;
+  return $form;
 }
 
 /**
  * Payment method callback: checkout form submission.
- *
  * @param $payment_method
  * @param $pane_form
  * @param $pane_values
@@ -219,88 +199,86 @@ function commerce_paymaster_submit_form($payment_method, $pane_values, $checkout
  */
 function commerce_paymaster_submit_form_submit($payment_method, $pane_form, $pane_values, $order, $charge)
 {
-	$order->data['commerce_paymaster'] = $pane_values;
+  $order->data['commerce_paymaster'] = $pane_values;
 }
 
 /**
  * Payment method callback: payment redirect form.
- *
  * @param $form
  * @param $form_state
  * @param $order
  * @param $payment_method
- *
  * @return
  */
 function commerce_paymaster_redirect_form($form, &$form_state, $order, $payment_method)
 {
+  global $base_url;
 
-	$form['#action'] = COMMERCE_PAYMASTER_INIT_URL;
+  $form['#action'] = COMMERCE_PAYMASTER_INIT_URL;
 
-	$order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-	$currency_code = $payment_method['settings']['paymaster_currency'];
-	$amount        = $order_wrapper->commerce_order_total->amount->value();
-	$amount        = commerce_currency_amount_to_decimal($amount, $currency_code);
-	$merchant_id   = $payment_method['settings']['paymaster_merchant_id'];
-	$description   = token_replace($payment_method['settings']['paymaster_desc'], array('commerce-order' => $order));
-	$sign_method   = $payment_method['settings']['paymaster_sign_method'];
-	if (empty($description))
-	{
-		$description = token_replace(t('Payment for order #[commerce-order:order-id]'), array('commerce-order' => $order));
-	}
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+  $currency_code = $payment_method['settings']['paymaster_currency'];
+  $amount = $order_wrapper->commerce_order_total->amount->value();
+  $amount = number_format((float)commerce_currency_amount_to_decimal($amount, $currency_code), 2, '.', '');
+  $merchant_id = $payment_method['settings']['paymaster_merchant_id'];
+  $description = token_replace($payment_method['settings']['paymaster_desc'], array('commerce-order' => $order));
+  $sign_method = $payment_method['settings']['paymaster_sign_method'];
+  if (empty($description)) {
+    $description = token_replace(t('Payment for order #[commerce-order:order-id]'), array('commerce-order' => $order));
+  }
 
-	$address = $order_wrapper->commerce_customer_billing->commerce_customer_address->value();
+  $address = $order_wrapper->commerce_customer_billing->commerce_customer_address->value();
 
-	$data = array(
-		'LMI_PAYMENT_AMOUNT' => $amount,
-		'LMI_PAYMENT_DESC'   => $description,
-		'LMI_PAYMENT_NO'     => $order->order_id,
-		'LMI_MERCHANT_ID'    => $merchant_id,
-		'LMI_CURRENCY'       => $currency_code,
-		'LMI_PAYER_EMAIL'    => $order->mail,
-		'PAYER_NAME'         => $address['name_line'],
-		'PAYER_ADRESS'       => $address['locality'],
-		'SIGN'               => commerce_paymaster_get_sign($merchant_id, $order->order_id, number_format((float) $amount, 2, '.', ''), $currency_code, $payment_method['settings']['paymaster_secret'], $sign_method),
-	);
+  $data = array(
+    'LMI_PAYMENT_AMOUNT' => $amount,
+    'LMI_PAYMENT_DESC' => $description,
+    'LMI_PAYMENT_NO' => $order->order_id,
+    'LMI_MERCHANT_ID' => $merchant_id,
+    'LMI_CURRENCY' => $currency_code,
+    'LMI_PAYER_EMAIL' => $order->mail,
+    'PAYER_NAME' => $address['name_line'],
+    'PAYER_ADRESS' => $address['locality'],
+    'LMI_PAYMENT_NOTIFICATION_URL' => $base_url . url(COMMERCE_PAYMASTER_RESULT_URL),
+    'LMI_SUCCESS_URL' => $base_url . url(COMMERCE_PAYMASTER_SUCCESS_URL),
+    'LMI_SUCCESS_METHOD' => 'POST',
+    'LMI_FAIL_URL' => $base_url . url(COMMERCE_PAYMASTER_FAIL_URL),
+    'LMI_FAIL_METHOD' => 'POST',
+    'SIGN' => commerce_paymaster_get_sign($merchant_id, $order->order_id, $amount, $currency_code, $payment_method['settings']['paymaster_secret'], $sign_method),
+  );
 
-	$order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
 
-	foreach ($order_wrapper->commerce_line_items as $key => $line_item_wrapper)
-	{
+  foreach ($order_wrapper->commerce_line_items as $key => $line_item_wrapper) {
 
-		if ($line_item_wrapper->type->value() == 'product')
-		{
-			$data["LMI_SHOPPINGCART.ITEM[{$key}].NAME"]  = $line_item_wrapper->commerce_product->value()->title;
-			$data["LMI_SHOPPINGCART.ITEM[{$key}].QTY"]   = (float) $line_item_wrapper->quantity->value();
-			$data["LMI_SHOPPINGCART.ITEM[{$key}].PRICE"] = commerce_currency_amount_to_decimal($line_item_wrapper->commerce_unit_price->amount->value(), $currency_code);;
-			$data["LMI_SHOPPINGCART.ITEM[{$key}].TAX"] = $payment_method['settings']["paymaster_product_{$line_item_wrapper->commerce_product->value()->type}_vat"];
-		}
-		if ($line_item_wrapper->type->value() == "shipping")
-		{
-			$shipping_data                               = $line_item_wrapper->value()->data;
-			$data["LMI_SHOPPINGCART.ITEM[{$key}].NAME"]  = $shipping_data['shipping_service']['title'];
-			$data["LMI_SHOPPINGCART.ITEM[{$key}].QTY"]   = (float) 1;
-			$data["LMI_SHOPPINGCART.ITEM[{$key}].PRICE"] = commerce_currency_amount_to_decimal($line_item_wrapper->commerce_unit_price->amount->value(), $currency_code);;
-			$data["LMI_SHOPPINGCART.ITEM[{$key}].TAX"] = $payment_method['settings']["paymaster_shipping_vat"];
-		}
+    if ($line_item_wrapper->type->value() == 'product') {
+      $data["LMI_SHOPPINGCART.ITEM[{$key}].NAME"] = $line_item_wrapper->commerce_product->value()->title;
+      $data["LMI_SHOPPINGCART.ITEM[{$key}].QTY"] = (float)$line_item_wrapper->quantity->value();
+      $data["LMI_SHOPPINGCART.ITEM[{$key}].PRICE"] = commerce_currency_amount_to_decimal($line_item_wrapper->commerce_unit_price->amount->value(), $currency_code);;
+      $data["LMI_SHOPPINGCART.ITEM[{$key}].TAX"] = $payment_method['settings']["paymaster_product_{$line_item_wrapper->commerce_product->value()->type}_vat"];
+    }
+    if ($line_item_wrapper->type->value() == "shipping") {
+      $shipping_data = $line_item_wrapper->value()->data;
+      $data["LMI_SHOPPINGCART.ITEM[{$key}].NAME"] = $shipping_data['shipping_service']['title'];
+      $data["LMI_SHOPPINGCART.ITEM[{$key}].QTY"] = (float)1;
+      $data["LMI_SHOPPINGCART.ITEM[{$key}].PRICE"] = commerce_currency_amount_to_decimal($line_item_wrapper->commerce_unit_price->amount->value(), $currency_code);;
+      $data["LMI_SHOPPINGCART.ITEM[{$key}].TAX"] = $payment_method['settings']["paymaster_shipping_vat"];
+    }
+  }
+
+  foreach ($data as $key => $value) {
+    $value = trim($value);
+    $form[$key] = array('#type' => 'hidden', '#value' => $value);
+  }
+
+  $form['actions'] = array('#type' => 'actions');
+
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Pay via PayMaster'),
+  );
 
 
-	}
-
-	foreach ($data as $key => $value)
-	{
-		$value      = trim($value);
-		$form[$key] = array('#type' => 'hidden', '#value' => $value);
-	}
-
-	$form['actions'] = array('#type' => 'actions');
-
-	$form['actions']['submit'] = array(
-		'#type'  => 'submit',
-		'#value' => t('Pay via PayMaster'),
-	);
-
-	return $form;
+  return $form;
 }
 
 /**
@@ -310,19 +288,19 @@ function commerce_paymaster_redirect_form($form, &$form_state, $order, $payment_
  *   Order for which the transaction will be saved.
  * @param object $order_wrapper
  *   Order Wrapper for which the transaction will be saved.
- * @param        $remote_id
+ * @param $remote_id
  *   Paymaster transaction id
  */
 function commerce_paymaster_create_transaction($order, $order_wrapper, $remote_id)
 {
-	$transaction                = commerce_payment_transaction_new('commerce_paymaster', $order->order_id);
-	$transaction->instance_id   = $order->data['payment_method'];
-	$transaction->amount        = $order_wrapper->commerce_order_total->amount->value();
-	$transaction->currency_code = $order_wrapper->commerce_order_total->currency_code->value();
-	$transaction->status        = COMMERCE_PAYMENT_STATUS_SUCCESS;
-	$transaction->message       = t('The payment has completed.');
-	$transaction->remote_id     = $remote_id;
-	commerce_payment_transaction_save($transaction);
+  $transaction = commerce_payment_transaction_new('commerce_paymaster', $order->order_id);
+  $transaction->instance_id = $order->data['payment_method'];
+  $transaction->amount = $order_wrapper->commerce_order_total->amount->value();
+  $transaction->currency_code = $order_wrapper->commerce_order_total->currency_code->value();
+  $transaction->status = COMMERCE_PAYMENT_STATUS_SUCCESS;
+  $transaction->message = t('The payment has completed.');
+  $transaction->remote_id = $remote_id;
+  commerce_payment_transaction_save($transaction);
 }
 
 
@@ -332,14 +310,12 @@ function commerce_paymaster_create_transaction($order, $order_wrapper, $remote_i
  */
 function commerce_paymaster_status_list()
 {
-	$datas = commerce_order_statuses();
+  $datas = commerce_order_statuses();
 
-	foreach ($datas as $key => $data)
-	{
-		$status[$key] = $data['title'];
-	}
-
-	return $status;
+  foreach ($datas as $key => $data) {
+    $status[$key] = $data['title'];
+  }
+  return $status;
 }
 
 
@@ -349,47 +325,43 @@ function commerce_paymaster_status_list()
  */
 function commerce_paymaster_sign_options()
 {
-	return array(
-		'sha256' => 'sha256',
-		'md5'    => 'md5',
-		'sha1'   => 'sha1',
-	);
+  return array(
+    'sha256' => 'sha256',
+    'md5' => 'md5',
+    'sha1' => 'sha1',
+  );
 }
 
 /**
  * Функция возвращает подписанный запрос непонятно для чего?!
- *
- * @param        $merchant_id
- * @param        $order_id
- * @param        $amount
- * @param        $lmi_currency
- * @param        $secret_key
+ * @param $merchant_id
+ * @param $order_id
+ * @param $amount
+ * @param $lmi_currency
+ * @param $secret_key
  * @param string $sign_method
  */
 function commerce_paymaster_get_sign($merchant_id, $order_id, $amount, $lmi_currency, $secret_key, $sign_method = 'md5')
 {
-	$plain_sign = $merchant_id . $order_id . $amount . $lmi_currency . $secret_key;
-	$sign       = base64_encode(hash($sign_method, $plain_sign, true));
-
-	return $sign;
+  $plain_sign = $merchant_id . $order_id . $amount . $lmi_currency . $secret_key;
+  return base64_encode(hash($sign_method, $plain_sign, TRUE));
 }
 
 
 /**
  * Функция возвращает hash по определенному алгоритму
- *
- * @param        $merchant_id
- * @param        $order_id
- * @param        $amount
- * @param        $lmi_currency
- * @param        $secret_key
+ * @param $merchant_id
+ * @param $order_id
+ * @param $amount
+ * @param $lmi_currency
+ * @param $secret_key
  * @param string $sign_method
  */
 function commerce_paymaster_get_hash($LMI_MERCHANT_ID, $LMI_PAYMENT_NO, $LMI_SYS_PAYMENT_ID, $LMI_SYS_PAYMENT_DATE, $LMI_PAYMENT_AMOUNT, $LMI_CURRENCY, $LMI_PAID_AMOUNT, $LMI_PAID_CURRENCY, $LMI_PAYMENT_SYSTEM, $LMI_SIM_MODE, $SECRET, $hash_method = 'md5')
 {
-	$string = $LMI_MERCHANT_ID . ";" . $LMI_PAYMENT_NO . ";" . $LMI_SYS_PAYMENT_ID . ";" . $LMI_SYS_PAYMENT_DATE . ";" . $LMI_PAYMENT_AMOUNT . ";" . $LMI_CURRENCY . ";" . $LMI_PAID_AMOUNT . ";" . $LMI_PAID_CURRENCY . ";" . $LMI_PAYMENT_SYSTEM . ";" . $LMI_SIM_MODE . ";" . $SECRET;
+  $string = $LMI_MERCHANT_ID . ";" . $LMI_PAYMENT_NO . ";" . $LMI_SYS_PAYMENT_ID . ";" . $LMI_SYS_PAYMENT_DATE . ";" . $LMI_PAYMENT_AMOUNT . ";" . $LMI_CURRENCY . ";" . $LMI_PAID_AMOUNT . ";" . $LMI_PAID_CURRENCY . ";" . $LMI_PAYMENT_SYSTEM . ";" . $LMI_SIM_MODE . ";" . $SECRET;
 
-	$hash = base64_encode(hash($hash_method, $string, true));
+  $hash = base64_encode(hash($hash_method, $string, TRUE));
 
-	return $hash;
+  return $hash;
 }
