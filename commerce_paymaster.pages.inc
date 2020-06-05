@@ -9,7 +9,7 @@
  */
 function commerce_paymaster_result_page_callback() {
   if (!empty($_POST)) {
-//    watchdog('paymaster', print_r($_POST, TRUE));
+    
     if (isset($_POST["LMI_PREREQUEST"]) && ($_POST["LMI_PREREQUEST"] == "1" || $_POST["LMI_PREREQUEST"] == "2")) {
       print 'YES';
       die;
