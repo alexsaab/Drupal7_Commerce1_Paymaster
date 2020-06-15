@@ -100,7 +100,7 @@ function commerce_paymaster_settings_form($settings = NULL)
     '#type' => 'select',
     '#title' => t('Hash method for SIGN request option'),
     '#options' => commerce_paymaster_sign_options(),
-    '#default_value' => variable_get('paymaster_sign_method', 'md5'),
+    '#default_value' => $settings['paymaster_sign_method'],
   );
 
   $form['paymaster_desc'] = array(
